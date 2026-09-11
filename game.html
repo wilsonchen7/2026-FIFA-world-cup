@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Football Star Match</title>
+
+<style>
+/* =========================================================
+   GAME PAGE CSS
+========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --dark: #061c14;
+    --green: #0b3d2e;
+    --green2: #126044;
+    --lime: #c8ff36;
+    --white: #ffffff;
+    --gray: #b7c5bf;
+    --red: #ff5757;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--white);
+    background:
+        radial-gradient(circle at top, #123d2c 0%, var(--dark) 48%, #020b08 100%);
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 6%;
+    background: rgba(3,18,12,.96);
+    border-bottom: 1px solid rgba(200,255,54,.2);
+}
+
+header a {
+    color: white;
+    text-decoration: none;
+    font-weight: 800;
+}
+
+header a:hover {
+    color: var(--lime);
+}
+
+.logo {
+    color: var(--lime);
+    font-weight: 900;
+    letter-spacing: 2px;
+    font-size: 21px;
+}
+
+.hero {
+    text-align: center;
+    padding: 55px 20px 30px;
+}
+
+.hero small {
+    color: var(--lime);
+    letter-spacing: 4px;
+    font-weight: 900;
+}
+
+.hero h1 {
+    margin: 12px 0;
+    font-size: clamp(42px, 7vw, 76px);
+}
+
+.hero p {
+    max-width: 700px;
+    margin: auto;
+    color: var(--gray);
+    line-height: 1.7;
+}
+
+.players {
+    max-width: 1100px;
+    margin: 20px auto 35px;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.player {
+    border: 1px solid rgba(200,255,54,.18);
+    border-radius: 18px;
+    padding: 22px 12px;
+    color: white;
+    background: linear-gradient(145deg, rgba(18,96,68,.75), rgba(4,28,19,.95));
+    cursor: pointer;
+    transition: .25s;
+}
+
+.player:hover,
+.player.selected {
+    transform: translateY(-4px);
+    border-color: var(--lime);
+    box-shadow: 0 0 0 2px rgba(200,255,54,.12);
+}
+
+.number {
+    width: 42px;
+    height: 42px;
+    margin: 0 auto 10px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--lime);
+    color: #102000;
+    font-weight: 900;
+}
+
+.player strong,
+.player span {
+    display: block;
+    text-align: center;
+}
+
+.player span {
+    color: var(--gray);
+    font-size: 12px;
+    margin-top: 7px;
+}
+
+.game {
+    max-width: 1120px;
+    margin: auto;
+    padding: 0 20px 70px;
+}
+
+.scoreboard {
+    display: grid;
+    grid-template-columns: 1fr 160px 1fr;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.team {
+    min-height: 75px;
+    padding: 12px 20px;
+    background: rgba(4,25,17,.9);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.you {
+    border-left: 4px solid var(--lime);
+}
+
+.cpu {
+    border-right: 4px solid var(--red);
+}
+
+.team label {
+    color: var(--gray);
+    font-size: 11px;
+    letter-spacing: 2px;
+    font-weight: 900;
+}
+
+.team b {
+    font-size: 38px;
+}
+
+.middle {
+    text-align: center;
+}
+
+.status {
+    color: var(--lime);
+    font-weight: 900;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+.timer {
+    margin-top: 5px;
+    font-size: 28px;
+    font-weight: 900;
+}
+
+.selected-name {
+    text-align: center;
+    color: var(--gray);
+    font-size: 12px;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+}
+
+.selected-name b {
+    color: var(--lime);
+}
+
+.pitch-box {
+    padding: 10px;
+    border-radius: 22px;
+    background: #04150e;
+    border: 1px solid rgba(200,255,54,.15);
+    box-shadow: 0 25px 60px rgba(0,0,0,.45);
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 15px;
+    background: #168044;
+}
+
+.controls {
+    margin-top: 18px;
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 12px;
+}
+
+.control {
+    padding: 17px;
+    text-align: center;
+    border-radius: 14px;
+    background: rgba(4,25,17,.75);
+}
+
+.control b {
+    display: block;
+    color: var(--lime);
+    margin-bottom: 6px;
+}
+
+.control span {
+    color: var(--gray);
+    font-size: 13px;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+button.action {
+    border: 0;
+    border-radius: 999px;
+    padding: 14px 28px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.start {
+    background: var(--lime);
+    color: #102000;
+}
+
+.restart {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,.25) !important;
+}
+
+.message {
+    min-height: 35px;
+    text-align: center;
+    margin-top: 18px;
+    color: var(--gray);
+    font-weight: 800;
+}
+
+.mobile {
+    display: none;
+    margin-top: 20px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.pad {
+    position: relative;
+    width: 150px;
+    height: 150px;
+}
+
+.pad button {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    border: 0;
+    border-radius: 12px;
+    background: #102f22;
+    color: white;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.pad button:active {
+    background: var(--lime);
+    color: #102000;
+}
+
+.up { left: 51px; top: 0; }
+.left { left: 0; top: 51px; }
+.down { left: 51px; top: 102px; }
+.right { left: 102px; top: 51px; }
+
+.shoot {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid var(--lime);
+    background: #112d20;
+    color: white;
+    font-weight: 900;
+}
+
+
+.mode-section {
+    max-width: 900px;
+    margin: 5px auto 25px;
+    padding: 0 20px;
+    text-align: center;
+}
+
+.mode-section h2 {
+    margin-bottom: 14px;
+    font-size: 24px;
+}
+
+.mode-options {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.mode-btn {
+    border: 2px solid rgba(200,255,54,.25);
+    background: rgba(4,25,17,.8);
+    color: white;
+    border-radius: 999px;
+    padding: 13px 22px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.mode-btn:hover,
+.mode-btn.active {
+    background: var(--lime);
+    color: #102000;
+    border-color: var(--lime);
+}
+
+.mode-description {
+    color: var(--gray);
+    margin-top: 12px;
+    font-size: 13px;
+}
+
+.second-player-selection {
+    display: none;
+}
+
+.second-player-selection.show {
+    display: grid;
+}
+
+.selection-title {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--lime);
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 2px;
+}
+
+.hidden {
+    display: none;
+}
+
+.two-player-help {
+    display: none;
+}
+
+.two-player-help.show {
+    display: block;
+}
+
+@media(max-width:850px) {
+    .players {
+        grid-template-columns: repeat(2,1fr);
+    }
+}
+
+@media(max-width:600px) {
+    .mode-btn {
+        width: 100%;
+    }
+
+    header {
+        padding: 15px;
+    }
+
+    .logo {
+        font-size: 15px;
+    }
+
+    .scoreboard {
+        grid-template-columns: 1fr 90px 1fr;
+    }
+
+    .team {
+        flex-direction: column;
+        justify-content: center;
+        gap: 4px;
+        padding: 8px;
+    }
+
+    .team b {
+        font-size: 27px;
+    }
+
+    .controls {
+        display: none;
+    }
+
+    .mobile {
+        display: flex;
+    }
+
+    .buttons {
+        flex-direction: column;
+    }
+
+    button.action {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <a href="index.html">← Back to Home</a>
+    <div class="logo">⚽ STAR MATCH</div>
+</header>
+
+<section class="hero">
+    <small>FOOTBALL STAR ARENA</small>
+    <h1>Choose Your Star</h1>
+    <p>
+        Select a star, start the match, move around the pitch and
+        try to score more goals than the CPU.
+    </p>
+</section>
+
+<section class="mode-section">
+    <h2>Choose Game Mode</h2>
+    <div class="mode-options">
+        <button class="mode-btn active" data-mode="single">1 PLAYER — VS CPU</button>
+        <button class="mode-btn" data-mode="double">2 PLAYERS — LOCAL MATCH</button>
+    </div>
+    <p class="mode-description" id="modeDescription">
+        Single Player: choose one star and play against the CPU.
+    </p>
+</section>
+
+<section class="players" id="playerOneSelection">
+
+    <button class="player" data-player="messi">
+        <div class="number">10</div>
+        <strong>Lionel Messi</strong>
+        <span>Playmaker</span>
+    </button>
+
+    <button class="player" data-player="ronaldo">
+        <div class="number">7</div>
+        <strong>Cristiano Ronaldo</strong>
+        <span>Forward</span>
+    </button>
+
+    <button class="player" data-player="mbappe">
+        <div class="number">10</div>
+        <strong>Kylian Mbappé</strong>
+        <span>Forward</span>
+    </button>
+
+    <button class="player" data-player="haaland">
+        <div class="number">9</div>
+        <strong>Erling Haaland</strong>
+        <span>Striker</span>
+    </button>
+
+</section>
+
+<section class="players second-player-selection" id="playerTwoSelection">
+    <div class="selection-title">PLAYER 2 — CHOOSE YOUR STAR</div>
+
+    <button class="player" data-player2="messi">
+        <div class="number">10</div>
+        <strong>Lionel Messi</strong>
+        <span>Player 2</span>
+    </button>
+
+    <button class="player" data-player2="ronaldo">
+        <div class="number">7</div>
+        <strong>Cristiano Ronaldo</strong>
+        <span>Player 2</span>
+    </button>
+
+    <button class="player" data-player2="mbappe">
+        <div class="number">10</div>
+        <strong>Kylian Mbappé</strong>
+        <span>Player 2</span>
+    </button>
+
+    <button class="player" data-player2="haaland">
+        <div class="number">9</div>
+        <strong>Erling Haaland</strong>
+        <span>Player 2</span>
+    </button>
+</section>
+
+<main class="game">
+
+    <div class="scoreboard">
+
+        <div class="team you">
+            <label id="leftLabel">YOU</label>
+            <b id="userScore">0</b>
+        </div>
+
+        <div class="middle">
+            <div class="status" id="status">READY</div>
+            <div class="timer" id="timer">02:00</div>
+        </div>
+
+        <div class="team cpu">
+            <label id="rightLabel">CPU</label>
+            <b id="cpuScore">0</b>
+        </div>
+
+    </div>
+
+    <div class="selected-name">
+        <span id="selectionText">YOU ARE PLAYING AS:</span>
+        <b id="selectedName">NONE</b>
+        <span id="secondSelectedWrap" class="hidden">
+            &nbsp; VS &nbsp;<b id="selectedName2">NONE</b>
+        </span>
+    </div>
+
+    <div class="pitch-box">
+        <canvas id="canvas" width="1000" height="600"></canvas>
+    </div>
+
+    <div class="controls">
+        <div class="control">
+            <b>MOVE</b>
+            <span>W A S D / Arrow Keys</span>
+        </div>
+
+        <div class="control">
+            <b>SHOOT</b>
+            <span>SPACE</span>
+        </div>
+
+        <div class="control">
+            <b>RESTART</b>
+            <span>R</span>
+        </div>
+    </div>
+
+
+    <div class="two-player-help" id="twoPlayerHelp">
+        <div class="control">
+            <b>PLAYER 1</b>
+            <span>W A S D + SPACE TO SHOOT</span>
+        </div>
+        <div class="control">
+            <b>PLAYER 2</b>
+            <span>ARROW KEYS + ENTER TO SHOOT</span>
+        </div>
+    </div>
+
+    <div class="mobile">
+
+        <div class="pad">
+            <button class="up" data-key="ArrowUp">▲</button>
+            <button class="left" data-key="ArrowLeft">◀</button>
+            <button class="down" data-key="ArrowDown">▼</button>
+            <button class="right" data-key="ArrowRight">▶</button>
+        </div>
+
+        <button class="shoot" id="mobileShoot">
+            ⚽<br>
+            SHOOT
+        </button>
+
+    </div>
+
+    <div class="buttons">
+        <button class="action start" id="start">START MATCH</button>
+        <button class="action restart" id="restart">RESTART</button>
+    </div>
+
+    <div class="message" id="message">
+        Choose a star to begin.
+    </div>
+
+</main>
+
+<script>
+/* =========================================================
+   FOOTBALL STAR MATCH — SINGLE + DOUBLE PLAYER
+========================================================= */
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+const players = document.querySelectorAll(".player[data-player]");
+const player2Buttons = document.querySelectorAll(".player[data-player2]");
+const modeButtons = document.querySelectorAll(".mode-btn");
+
+const start = document.getElementById("start");
+const restart = document.getElementById("restart");
+const userScoreEl = document.getElementById("userScore");
+const cpuScoreEl = document.getElementById("cpuScore");
+const timerEl = document.getElementById("timer");
+const statusEl = document.getElementById("status");
+const selectedNameEl = document.getElementById("selectedName");
+const selectedName2El = document.getElementById("selectedName2");
+const secondSelectedWrap = document.getElementById("secondSelectedWrap");
+const selectionText = document.getElementById("selectionText");
+const leftLabel = document.getElementById("leftLabel");
+const rightLabel = document.getElementById("rightLabel");
+const messageEl = document.getElementById("message");
+const modeDescription = document.getElementById("modeDescription");
+const playerTwoSelection = document.getElementById("playerTwoSelection");
+const twoPlayerHelp = document.getElementById("twoPlayerHelp");
+
+const W = canvas.width;
+const H = canvas.height;
+
+const starData = {
+    messi: {
+        name: "Lionel Messi",
+        number: 10,
+        speed: 4.3,
+        shot: 8.8
+    },
+    ronaldo: {
+        name: "Cristiano Ronaldo",
+        number: 7,
+        speed: 4.0,
+        shot: 9.2
+    },
+    mbappe: {
+        name: "Kylian Mbappé",
+        number: 10,
+        speed: 5.0,
+        shot: 8.7
+    },
+    haaland: {
+        name: "Erling Haaland",
+        number: 9,
+        speed: 3.7,
+        shot: 9.5
+    }
+};
+
+let gameMode = "single";
+let selected = null;
+let selected2 = null;
+let running = false;
+let over = false;
+let scoreYou = 0;
+let scoreCPU = 0;
+let remaining = 120;
+let last = 0;
+let kickDelay = 0;
+let cpuCooldown = 0;
+
+const keys = {};
+
+const user = {
+    x: 250,
+    y: H / 2,
+    r: 22,
+    speed: 4.2,
+    color: "#c8ff36",
+    number: 10,
+    side: "left"
+};
+
+const opponent = {
+    x: 750,
+    y: H / 2,
+    r: 22,
+    speed: 4.0,
+    color: "#ff5757",
+    number: 1,
+    side: "right"
+};
+
+const ball = {
+    x: W / 2,
+    y: H / 2,
+    r: 10,
+    vx: 0,
+    vy: 0
+};
+
+/* ---------------- MODE ---------------- */
+
+modeButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        setMode(btn.dataset.mode);
+    });
+});
+
+function setMode(mode) {
+    if (running) {
+        resetGame();
+    }
+
+    gameMode = mode;
+
+    modeButtons.forEach(btn => btn.classList.remove("active"));
+    document
+        .querySelector(`[data-mode="${mode}"]`)
+        .classList.add("active");
+
+    if (mode === "single") {
+        playerTwoSelection.classList.remove("show");
+        twoPlayerHelp.classList.remove("show");
+
+        modeDescription.textContent =
+            "Single Player: choose one star and play against the CPU.";
+
+        leftLabel.textContent = "YOU";
+        rightLabel.textContent = "CPU";
+        selectionText.textContent = "YOU ARE PLAYING AS:";
+        secondSelectedWrap.classList.add("hidden");
+
+        messageEl.textContent = selected
+            ? `${selected.name} selected. Press START MATCH.`
+            : "Choose a star to begin.";
+    } else {
+        playerTwoSelection.classList.add("show");
+        twoPlayerHelp.classList.add("show");
+
+        modeDescription.textContent =
+            "Double Player: two people play locally on the same keyboard.";
+
+        leftLabel.textContent = "PLAYER 1";
+        rightLabel.textContent = "PLAYER 2";
+        selectionText.textContent = "PLAYER 1:";
+        secondSelectedWrap.classList.remove("hidden");
+
+        messageEl.textContent =
+            "Choose a star for Player 1 and Player 2.";
+    }
+
+    resetPositions();
+    draw();
+}
+
+/* ---------------- PLAYER SELECTION ---------------- */
+
+players.forEach(btn => {
+    btn.addEventListener("click", () => {
+        selectPlayer(btn.dataset.player);
+    });
+});
+
+player2Buttons.forEach(btn => {
+    btn.addEventListener("click", () => {
+        selectPlayer2(btn.dataset.player2);
+    });
+});
+
+function selectPlayer(id) {
+    selected = starData[id];
+
+    players.forEach(p => p.classList.remove("selected"));
+    document
+        .querySelector(`[data-player="${id}"]`)
+        .classList.add("selected");
+
+    selectedNameEl.textContent = selected.name;
+    user.speed = selected.speed;
+    user.number = selected.number;
+
+    if (gameMode === "single") {
+        messageEl.textContent =
+            `${selected.name} selected. Press START MATCH.`;
+    } else {
+        messageEl.textContent =
+            `${selected.name} selected for Player 1.`;
+    }
+}
+
+function selectPlayer2(id) {
+    selected2 = starData[id];
+
+    player2Buttons.forEach(p => p.classList.remove("selected"));
+    document
+        .querySelector(`[data-player2="${id}"]`)
+        .classList.add("selected");
+
+    selectedName2El.textContent = selected2.name;
+    opponent.speed = selected2.speed;
+    opponent.number = selected2.number;
+
+    if (selected) {
+        messageEl.textContent =
+            `${selected.name} vs ${selected2.name}. Press START MATCH.`;
+    } else {
+        messageEl.textContent =
+            "Choose a star for Player 1 first.";
+    }
+}
+
+/* ---------------- KEYBOARD ---------------- */
+
+window.addEventListener("keydown", e => {
+    keys[e.key] = true;
+    keys[e.code] = true;
+
+    if (e.code === "Space") {
+        e.preventDefault();
+        shoot(user);
+    }
+
+    if (gameMode === "double" && e.code === "Enter") {
+        e.preventDefault();
+        shoot(opponent);
+    }
+
+    if (e.key.toLowerCase() === "r") {
+        resetGame();
+    }
+});
+
+window.addEventListener("keyup", e => {
+    keys[e.key] = false;
+    keys[e.code] = false;
+});
+
+/* ---------------- MOBILE CONTROLS ---------------- */
+
+document.querySelectorAll(".pad button").forEach(btn => {
+    const key = btn.dataset.key;
+
+    const press = e => {
+        e.preventDefault();
+        keys[key] = true;
+    };
+
+    const release = e => {
+        e.preventDefault();
+        keys[key] = false;
+    };
+
+    btn.addEventListener("touchstart", press, { passive: false });
+    btn.addEventListener("touchend", release, { passive: false });
+    btn.addEventListener("mousedown", press);
+    btn.addEventListener("mouseup", release);
+    btn.addEventListener("mouseleave", release);
+});
+
+document.getElementById("mobileShoot")
+    .addEventListener("click", () => shoot(user));
+
+/* ---------------- BUTTONS ---------------- */
+
+start.addEventListener("click", startGame);
+restart.addEventListener("click", resetGame);
+
+function startGame() {
+
+    if (!selected) {
+        messageEl.textContent = "Choose Player 1's star first!";
+        return;
+    }
+
+    if (gameMode === "double" && !selected2) {
+        messageEl.textContent = "Choose Player 2's star first!";
+        return;
+    }
+
+    scoreYou = 0;
+    scoreCPU = 0;
+    remaining = 120;
+    over = false;
+    running = true;
+    kickDelay = 1;
+    cpuCooldown = 0;
+
+    userScoreEl.textContent = "0";
+    cpuScoreEl.textContent = "0";
+    statusEl.textContent = "LIVE";
+
+    if (gameMode === "single") {
+        messageEl.textContent = "Match started — beat the CPU!";
+    } else {
+        messageEl.textContent = "Match started — Player 1 vs Player 2!";
+    }
+
+    resetPositions();
+
+    last = performance.now();
+
+    cancelAnimationFrame(window.gameFrame);
+    window.gameFrame = requestAnimationFrame(loop);
+}
+
+function resetGame() {
+
+    running = false;
+    over = false;
+    scoreYou = 0;
+    scoreCPU = 0;
+    remaining = 120;
+    kickDelay = 0;
+    cpuCooldown = 0;
+
+    userScoreEl.textContent = "0";
+    cpuScoreEl.textContent = "0";
+    timerEl.textContent = "02:00";
+    statusEl.textContent = "READY";
+
+    resetPositions();
+
+    if (gameMode === "single") {
+        messageEl.textContent =
+            selected
+                ? `${selected.name} selected. Press START MATCH.`
+                : "Choose a star to begin.";
+    } else {
+        messageEl.textContent =
+            selected && selected2
+                ? `${selected.name} vs ${selected2.name}. Press START MATCH.`
+                : "Choose a star for both players.";
+    }
+
+    cancelAnimationFrame(window.gameFrame);
+    draw();
+}
+
+/* ---------------- GAME LOOP ---------------- */
+
+function resetPositions() {
+    user.x = 250;
+    user.y = H / 2;
+
+    opponent.x = 750;
+    opponent.y = H / 2;
+
+    ball.x = W / 2;
+    ball.y = H / 2;
+
+    ball.vx = 0;
+    ball.vy = 0;
+}
+
+function loop(now) {
+
+    if (!running) {
+        draw();
+        return;
+    }
+
+    const dt = Math.min((now - last) / 1000, 0.05);
+    last = now;
+
+    update(dt);
+    draw();
+
+    window.gameFrame = requestAnimationFrame(loop);
+}
+
+function update(dt) {
+
+    if (over) return;
+
+    remaining -= dt;
+
+    if (remaining <= 0) {
+        remaining = 0;
+        updateTimer();
+        finish();
+        return;
+    }
+
+    updateTimer();
+
+    if (kickDelay > 0) {
+        kickDelay -= dt;
+        return;
+    }
+
+    moveUser();
+
+    if (gameMode === "single") {
+        moveCPU();
+        cpuAI();
+    } else {
+        movePlayer2();
+    }
+
+    moveBall();
+    collidePlayers();
+    checkGoals();
+}
+
+function updateTimer() {
+    const min = Math.floor(remaining / 60);
+    const sec = Math.floor(remaining % 60);
+
+    timerEl.textContent =
+        `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+}
+
+/* ---------------- MOVEMENT ---------------- */
+
+function moveUser() {
+    let dx = 0;
+    let dy = 0;
+
+    if (keys.ArrowUp || keys.w || keys.W) dy--;
+    if (keys.ArrowDown || keys.s || keys.S) dy++;
+    if (keys.ArrowLeft || keys.a || keys.A) dx--;
+    if (keys.ArrowRight || keys.d || keys.D) dx++;
+
+    if (dx || dy) {
+        const len = Math.hypot(dx, dy);
+        dx /= len;
+        dy /= len;
+
+        user.x += dx * user.speed;
+        user.y += dy * user.speed;
+    }
+
+    clamp(user);
+}
+
+function movePlayer2() {
+    let dx = 0;
+    let dy = 0;
+
+    if (keys.ArrowUp || keys.ArrowUp) dy--;
+    if (keys.ArrowDown || keys.ArrowDown) dy++;
+    if (keys.ArrowLeft || keys.ArrowLeft) dx--;
+    if (keys.ArrowRight || keys.ArrowRight) dx++;
+
+    /* Player 2 uses I J K L if Player 1 is using arrows,
+       and also accepts the arrow keys for simple testing.
+       The preferred double-player layout is:
+       Player 1 = W A S D + Space
+       Player 2 = Arrow Keys + Enter.
+    */
+    dx = 0;
+    dy = 0;
+
+    if (keys.ArrowUp) dy--;
+    if (keys.ArrowDown) dy++;
+    if (keys.ArrowLeft) dx--;
+    if (keys.ArrowRight) dx++;
+
+    if (dx || dy) {
+        const len = Math.hypot(dx, dy);
+        dx /= len;
+        dy /= len;
+
+        opponent.x += dx * opponent.speed;
+        opponent.y += dy * opponent.speed;
+    }
+
+    clamp(opponent);
+}
+
+function moveCPU() {
+    let tx = ball.x;
+    let ty = ball.y;
+
+    if (ball.x < 500) {
+        tx = 620;
+        ty = H / 2;
+    }
+
+    const dx = tx - opponent.x;
+    const dy = ty - opponent.y;
+    const len = Math.hypot(dx, dy);
+
+    if (len > 4) {
+        opponent.x += dx / len * opponent.speed;
+        opponent.y += dy / len * opponent.speed;
+    }
+
+    clamp(opponent);
+}
+
+function clamp(p) {
+    p.x = Math.max(45, Math.min(W - 45, p.x));
+    p.y = Math.max(45, Math.min(H - 45, p.y));
+}
+
+/* ---------------- BALL ---------------- */
+
+function moveBall() {
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+
+    ball.vx *= .985;
+    ball.vy *= .985;
+
+    if (ball.y < 35 || ball.y > H - 35) {
+        ball.vy *= -.8;
+        ball.y = Math.max(35, Math.min(H - 35, ball.y));
+    }
+
+    if (ball.x < 25 || ball.x > W - 25) {
+        const top = H / 2 - 95;
+        const bottom = H / 2 + 95;
+
+        if (!(ball.y > top && ball.y < bottom)) {
+            ball.vx *= -.8;
+        }
+    }
+}
+
+function collidePlayers() {
+    if (dist(user, ball) < user.r + ball.r + 5) {
+        pushBall(user);
+    }
+
+    if (dist(opponent, ball) < opponent.r + ball.r + 5) {
+        pushBall(opponent);
+    }
+}
+
+function pushBall(player) {
+    let dx = ball.x - player.x;
+    let dy = ball.y - player.y;
+    let len = Math.hypot(dx, dy);
+
+    if (!len) len = 1;
+
+    ball.x =
+        player.x + dx / len * (player.r + ball.r + 2);
+
+    ball.y =
+        player.y + dy / len * (player.r + ball.r + 2);
+}
+
+/* ---------------- SHOOTING ---------------- */
+
+function shoot(player) {
+
+    if (!running || kickDelay > 0) return;
+
+    if (dist(player, ball) > player.r + ball.r + 35) return;
+
+    let dx = 1;
+    let dy = 0;
+
+    if (player === user) {
+        if (keys.ArrowUp || keys.w || keys.W) dy = -1;
+        if (keys.ArrowDown || keys.s || keys.S) dy = 1;
+        if (keys.ArrowLeft || keys.a || keys.A) dx = -1;
+        if (keys.ArrowRight || keys.d || keys.D) dx = 1;
+
+        if (
+            !(keys.ArrowUp || keys.ArrowDown ||
+              keys.ArrowLeft || keys.ArrowRight ||
+              keys.w || keys.W || keys.a || keys.A ||
+              keys.s || keys.S || keys.d || keys.D)
+        ) {
+            dx = ball.x >= user.x ? 1 : -1;
+        }
+    } else {
+        if (keys.ArrowUp) dy = -1;
+        if (keys.ArrowDown) dy = 1;
+        if (keys.ArrowLeft) dx = -1;
+        if (keys.ArrowRight) dx = 1;
+
+        if (
+            !(keys.ArrowUp || keys.ArrowDown ||
+              keys.ArrowLeft || keys.ArrowRight)
+        ) {
+            dx = ball.x >= player.x ? 1 : -1;
+        }
+    }
+
+    const len = Math.hypot(dx, dy) || 1;
+
+    let power = 7.5;
+
+    if (player === user && selected) {
+        power = selected.shot;
+    }
+
+    if (player === opponent && selected2) {
+        power = selected2.shot;
+    }
+
+    ball.vx = dx / len * power;
+    ball.vy = dy / len * power;
+}
+
+/* ---------------- CPU AI ---------------- */
+
+function cpuAI() {
+    cpuCooldown--;
+
+    if (
+        dist(opponent, ball) < opponent.r + ball.r + 25 &&
+        ball.x < 620 &&
+        cpuCooldown <= 0
+    ) {
+        ball.vx = -8;
+        ball.vy = (H / 2 - ball.y) * .015;
+        cpuCooldown = 70;
+    }
+}
+
+/* ---------------- GOALS ---------------- */
+
+function checkGoals() {
+    const top = H / 2 - 95;
+    const bottom = H / 2 + 95;
+
+    if (
+        ball.x > W - 25 &&
+        ball.y > top &&
+        ball.y < bottom
+    ) {
+        scoreYou++;
+        userScoreEl.textContent = scoreYou;
+
+        goal(
+            gameMode === "single"
+                ? "YOU SCORED!"
+                : "PLAYER 1 SCORED!"
+        );
+    }
+
+    if (
+        ball.x < 25 &&
+        ball.y > top &&
+        ball.y < bottom
+    ) {
+        scoreCPU++;
+        cpuScoreEl.textContent = scoreCPU;
+
+        goal(
+            gameMode === "single"
+                ? "CPU SCORED!"
+                : "PLAYER 2 SCORED!"
+        );
+    }
+}
+
+function goal(text) {
+    kickDelay = 2;
+    resetPositions();
+
+    messageEl.textContent = text;
+
+    setTimeout(() => {
+        if (running) {
+            messageEl.textContent = "Play on!";
+        }
+    }, 1200);
+}
+
+/* ---------------- FULL TIME ---------------- */
+
+function finish() {
+    running = false;
+    over = true;
+    statusEl.textContent = "FULL TIME";
+
+    if (scoreYou > scoreCPU) {
+        messageEl.textContent =
+            gameMode === "single"
+                ? `🏆 YOU WIN! ${scoreYou} - ${scoreCPU}`
+                : `🏆 PLAYER 1 WINS! ${scoreYou} - ${scoreCPU}`;
+    } else if (scoreYou < scoreCPU) {
+        messageEl.textContent =
+            gameMode === "single"
+                ? `CPU WINS ${scoreCPU} - ${scoreYou}`
+                : `PLAYER 2 WINS ${scoreCPU} - ${scoreYou}`;
+    } else {
+        messageEl.textContent =
+            `DRAW! ${scoreYou} - ${scoreCPU}`;
+    }
+}
+
+/* ---------------- DRAWING ---------------- */
+
+function dist(a, b) {
+    return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+function draw() {
+    ctx.clearRect(0, 0, W, H);
+
+    drawField();
+    drawGoals();
+    drawPlayers();
+    drawBall();
+}
+
+function drawField() {
+    ctx.fillStyle = "#168044";
+    ctx.fillRect(0, 0, W, H);
+
+    for (let i = 0; i < 10; i++) {
+        if (i % 2 === 0) {
+            ctx.fillStyle = "rgba(0,0,0,.06)";
+            ctx.fillRect(
+                i * W / 10,
+                0,
+                W / 10,
+                H
+            );
+        }
+    }
+
+    ctx.strokeStyle = "rgba(255,255,255,.85)";
+    ctx.lineWidth = 4;
+
+    ctx.strokeRect(20, 30, W - 40, H - 60);
+
+    ctx.beginPath();
+    ctx.moveTo(W / 2, 30);
+    ctx.lineTo(W / 2, H - 30);
+    ctx.stroke();
+
+    ctx.strokeRect(20, H / 2 - 150, 150, 300);
+    ctx.strokeRect(W - 170, H / 2 - 150, 150, 300);
+
+    ctx.strokeRect(20, H / 2 - 90, 70, 180);
+    ctx.strokeRect(W - 90, H / 2 - 90, 70, 180);
+
+    ctx.beginPath();
+    ctx.arc(W / 2, H / 2, 85, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(W / 2, H / 2, 6, 0, Math.PI * 2);
+    ctx.fillStyle = "white";
+    ctx.fill();
+}
+
+function drawGoals() {
+    const h = 190;
+
+    ctx.fillStyle = "rgba(255,255,255,.2)";
+
+    ctx.fillRect(0, H / 2 - h / 2, 25, h);
+    ctx.fillRect(W - 25, H / 2 - h / 2, 25, h);
+
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 3;
+
+    ctx.strokeRect(0, H / 2 - h / 2, 25, h);
+    ctx.strokeRect(W - 25, H / 2 - h / 2, 25, h);
+}
+
+function drawPlayers() {
+    drawPlayer(
+        user,
+        user.number,
+        gameMode === "single" ? "YOU" : "P1"
+    );
+
+    drawPlayer(
+        opponent,
+        opponent.number,
+        gameMode === "single" ? "CPU" : "P2"
+    );
+}
+
+function drawPlayer(p, number, label) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+
+    ctx.fillStyle = p.color;
+    ctx.fill();
+
+    ctx.strokeStyle = "white";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.fillStyle = "#07140e";
+    ctx.font = "bold 14px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    ctx.fillText(number, p.x, p.y);
+
+    ctx.fillStyle = "white";
+    ctx.font = "bold 11px Arial";
+
+    ctx.fillText(
+        label,
+        p.x,
+        p.y - p.r - 12
+    );
+}
+
+function drawBall() {
+    ctx.beginPath();
+    ctx.arc(
+        ball.x,
+        ball.y,
+        ball.r,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fillStyle = "white";
+    ctx.fill();
+
+    ctx.strokeStyle = "#111";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.beginPath();
+    ctx.arc(
+        ball.x,
+        ball.y,
+        3,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fillStyle = "#222";
+    ctx.fill();
+}
+
+setMode("single");
+draw();
+</script>
+
+</body>
+</html>
